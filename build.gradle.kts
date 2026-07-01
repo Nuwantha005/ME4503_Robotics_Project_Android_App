@@ -7,3 +7,7 @@ plugins {
   alias(libs.plugins.secrets) apply false
   alias(libs.plugins.google.services) apply false
 }
+
+allprojects {
+    layout.buildDirectory.set(file("${System.getProperty("user.home")}/.cache/android_builds/${rootProject.name}/${project.name}"))
+}

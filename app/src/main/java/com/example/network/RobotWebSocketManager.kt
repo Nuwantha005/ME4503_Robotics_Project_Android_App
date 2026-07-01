@@ -1,5 +1,10 @@
 package com.example.network
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.util.Log
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -19,13 +24,10 @@ import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import java.util.concurrent.TimeUnit
 
-class RobotWebSocketManager {
+class RobotWebSocketManager(private val context: Context) {
 
-    private val client = OkHttpClient.Builder()
-        .connectTimeout(5, TimeUnit.SECONDS)
-        .readTimeout(10, TimeUnit.SECONDS)
-        .writeTimeout(5, TimeUnit.SECONDS)
-        .build()
+    private var client: OkHttpClient? = null
+    private var boundNetwork: Network? = null
 
     private var webSocket: WebSocket? = null
     private val scope = CoroutineScope(Dispatchers.IO + Job())
@@ -71,10 +73,54 @@ class RobotWebSocketManager {
         }
 
         _connectionStatus.value = ConnectionStatus.CONNECTING
+
+        if (boundNetwork == null) {
+            Log.d("RobotWS", "Requesting robot network binding...")
+            bindToRobotNetwork(context) {
+                Log.d("RobotWS", "Network bound, proceeding with connection")
+                executeConnect()
+            }
+        } else {
+            executeConnect()
+        }
+    }
+
+    private fun bindToRobotNetwork(context: Context, onReady: () -> Unit) {
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val request = NetworkRequest.Builder()
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .removeCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
+
+        cm.requestNetwork(request, object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                Log.d("RobotWS", "Network available: $network")
+                boundNetwork = network
+                onReady()
+            }
+        })
+    }
+
+    private fun executeConnect() {
+        val currentNetwork = boundNetwork
+        if (currentNetwork == null) {
+            Log.e("RobotWS", "Cannot connect: No network bound")
+            _connectionStatus.value = ConnectionStatus.DISCONNECTED
+            return
+        }
+
+        // Initialize OkHttp client with the specific network's socket factory
+        client = OkHttpClient.Builder()
+            .socketFactory(currentNetwork.socketFactory)
+            .connectTimeout(5, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(5, TimeUnit.SECONDS)
+            .build()
+
         val url = "ws://$activeIp/"
         val request = Request.Builder().url(url).build()
 
-        webSocket = client.newWebSocket(request, object : WebSocketListener() {
+        webSocket = client?.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
                 Log.d("RobotWS", "Connected to robot at $url")
                 _connectionStatus.value = ConnectionStatus.CONNECTED

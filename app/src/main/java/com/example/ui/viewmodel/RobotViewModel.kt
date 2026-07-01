@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 
 class RobotViewModel(application: Application) : AndroidViewModel(application), SensorEventListener {
 
-    private val wsManager = RobotWebSocketManager()
+    private val wsManager = RobotWebSocketManager(application)
 
     // Moshi JSON Adapters
     private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
