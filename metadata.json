@@ -1,0 +1,6 @@
+{
+  "name": "WMR Controller",
+  "description": "Sleek dark-themed controller with violet accents for the Autonomous Wheeled Mobile Robot (WMR). Features joystick, tilt, buttons control schemes, real-time sensor telemetry charts, Mapping, path planning and an isolated bring-up test-harness.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
