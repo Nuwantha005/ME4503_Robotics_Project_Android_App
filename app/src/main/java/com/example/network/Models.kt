@@ -43,6 +43,7 @@ data class ConfigMessage(
     @Json(name = "max_speed_mps") val maxSpeedMps: Float,
     @Json(name = "max_accel_mps2") val maxAccelMps2: Float,
     @Json(name = "obstacle_stop_distance_mm") val obstacleStopDistanceMm: Float,
+    @Json(name = "pid_enabled") val pidEnabled: Boolean,
     @Json(name = "pid_kp") val pidKp: Float,
     @Json(name = "pid_ki") val pidKi: Float,
     @Json(name = "pid_kd") val pidKd: Float,

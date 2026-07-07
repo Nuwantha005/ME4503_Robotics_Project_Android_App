@@ -164,7 +164,7 @@ fun WmrDashboard(viewModel: RobotViewModel) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
                                 text = "WMR CONTROLLER",
-                                style = MaterialTheme.typography.titleMedium,
+                                style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Black,
                                 letterSpacing = 2.sp
                             )
@@ -464,7 +464,7 @@ fun ConfigTabView(viewModel: RobotViewModel) {
                             Slider(
                                 value = viewModel.maxSpeedMps,
                                 onValueChange = { viewModel.maxSpeedMps = it },
-                                valueRange = 0.1f..2.5f,
+                                valueRange = 0.005f..0.8f,
                                 colors = SliderDefaults.colors(thumbColor = VioletPrimary, activeTrackColor = VioletPrimary)
                             )
                         }
@@ -478,7 +478,7 @@ fun ConfigTabView(viewModel: RobotViewModel) {
                             Slider(
                                 value = viewModel.maxAccelMps2,
                                 onValueChange = { viewModel.maxAccelMps2 = it },
-                                valueRange = 0.5f..5.0f,
+                                valueRange = 0.01f..1.0f,
                                 colors = SliderDefaults.colors(thumbColor = VioletPrimary, activeTrackColor = VioletPrimary)
                             )
                         }
@@ -508,7 +508,22 @@ fun ConfigTabView(viewModel: RobotViewModel) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                        Text("WHEEL PID LOOPS (Shared Gains)", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = VioletTertiary)
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("WHEEL PID LOOPS", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = VioletTertiary)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(if (viewModel.pidEnabled) "ENABLED" else "DISABLED", style = MaterialTheme.typography.labelSmall, color = if (viewModel.pidEnabled) AccentGreen else AccentRed)
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Switch(
+                                    checked = viewModel.pidEnabled,
+                                    onCheckedChange = { viewModel.pidEnabled = it },
+                                    colors = SwitchDefaults.colors(checkedThumbColor = VioletPrimary)
+                                )
+                            }
+                        }
 
                         // Kp
                         Column {

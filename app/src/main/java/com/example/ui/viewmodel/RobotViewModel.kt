@@ -55,11 +55,12 @@ class RobotViewModel(application: Application) : AndroidViewModel(application), 
     var robotIp by mutableStateOf("192.168.4.1")
 
     // Surface Level Config Variables
-    var maxSpeedMps by mutableStateOf(0.8f)
+    var maxSpeedMps by mutableStateOf(0.25f)
     var maxAccelMps2 by mutableStateOf(1.5f)
     var obstacleStopDistanceMm by mutableStateOf(150f)
 
     // Micro Managing PID & Kinematics Config Variables
+    var pidEnabled by mutableStateOf(false)
     var pidKp by mutableStateOf(1.2f)
     var pidKi by mutableStateOf(0.05f)
     var pidKd by mutableStateOf(0.01f)
@@ -228,6 +229,7 @@ class RobotViewModel(application: Application) : AndroidViewModel(application), 
                     maxSpeedMps = maxSpeedMps,
                     maxAccelMps2 = maxAccelMps2,
                     obstacleStopDistanceMm = obstacleStopDistanceMm,
+                    pidEnabled = pidEnabled,
                     pidKp = pidKp,
                     pidKi = pidKi,
                     pidKd = pidKd,
